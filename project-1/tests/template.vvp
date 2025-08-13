@@ -1,6 +1,7 @@
 module main;
 
   reg clk, reset;
+  reg [31:0] data[4:0];
   reg [31:0] x;
   wire [15:0] y;
   wire        rdy;
@@ -9,18 +10,20 @@ module main;
 
   always #10 clk = ~clk;
 
+  integer i;
   initial begin
-     clk = 0;
-     reset = 1;
+     /* Load the data set from the hex file. */
+     $readmemh("template_data.hex", data);
+     for (i = 0 ;  i <= 4 ;  i = i + 1) begin
+       clk = 0;
+       reset = 1;
 
-     if (! $value$plusargs("x=%d", x)) begin
-        $display("ERROR: please specify +x=<value> to start.");
-        $finish;
+       x = data[i];
+
+       #35 reset = 0;
+
+       wait (rdy) $display("y=%d", y);
      end
-
-     #35 reset = 0;
-
-     wait (rdy) $display("y=%d", y);
      $finish;
   end // initial begin
 
