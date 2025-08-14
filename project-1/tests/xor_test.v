@@ -1,8 +1,8 @@
-module and_test;
+module xor_test;
   reg a, b;
   wire out;
 
-  student_and dut (.a(a), .b(b), .out(out));
+  student_xor dut (.a(a), .b(b), .out(out));
 
   initial begin
     $display("| a | b |out|");

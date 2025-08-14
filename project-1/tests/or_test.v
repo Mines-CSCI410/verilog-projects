@@ -1,4 +1,4 @@
-module and_test;
+module or_test;
   reg a, b;
   wire out;
 
@@ -23,5 +23,5 @@ module and_test;
     b = 1;
     #4 $display("| %d | %d | %d |", a, b, out);
     $finish;
-  end // initial begin
-endmodule // and_test
+  end
+endmodule
