@@ -1,4 +1,4 @@
-module and_test;
+module and16_test;
   reg [15:0] a, b;
   wire [15:0] out;
 
