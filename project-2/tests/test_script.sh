@@ -4,7 +4,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 pushd ${SCRIPT_DIR} &> /dev/null
 
-TESTS=("half_adder" "full_adder")
+TESTS=("half_adder" "full_adder" "inc16" "add16" "alu")
 
 for TEST in ${TESTS[@]};
 do
