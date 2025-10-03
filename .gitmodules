@@ -1,9 +1,9 @@
 [submodule "project-1/autograder"]
 	path = project-1/autograder
-	url = https://github.com/grantlemons/project-1-autograder.git
+	url = https://github.com/Mines-CSCI410/project-1-autograder.git
 [submodule "project-2/autograder"]
 	path = project-2/autograder
-	url = https://github.com/grantlemons/project-2-autograder.git
+	url = https://github.com/Mines-CSCI410/project-2-autograder.git
 [submodule "project-3/autograder"]
 	path = project-3/autograder
-	url = https://github.com/grantlemons/project-3-autograder.git
+	url = https://github.com/Mines-CSCI410/project-3-autograder.git
