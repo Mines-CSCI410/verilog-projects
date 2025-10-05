@@ -56,6 +56,6 @@ for (test, line) in enumerate(lines):
         print(f'    #{test + 1} $display("{fmt_string}", {label_string});')
     print()
 
-print('  $finish;')
+print('    $finish;')
 print('  end')
 print('endmodule')
