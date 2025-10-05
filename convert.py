@@ -47,10 +47,10 @@ for (test, line) in enumerate(lines):
         if match('\\d+\\+', line[0]):
             time = int(line[0].removesuffix('+'))
             t_str = str(time) + '+'
-            print(f'    #{time * 2 + 1} $display("|{t_str:<4}{fmt_string}", {label_string})')
+            print(f'    #{time * 2 + 1} $display("|{t_str}{fmt_string}", {label_string})')
         else:
             time = int(line[0])
-            print(f'    #{time * 2} $display("|{time:<4}{fmt_string}", {label_string})')
+            print(f'    #{time * 2} $display("|{time}{fmt_string}", {label_string})')
     else:
         fmt_string, label_string = strings(labels)
         print(f'    #{test + 1} $display("{fmt_string}", {label_string});')
