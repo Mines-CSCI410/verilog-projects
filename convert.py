@@ -1,46 +1,61 @@
 from sys import argv
+from os import path
 from re import match
 
-labels: list[tuple[str, int]] = []
+input_filepath = argv[1]
+input_filename_module = path.basename(input_filepath).removesuffix('.cmp')
+
+labels: list[str] = []
 lines: list[list[str]] = []
 header_string = ""
-with open(argv[1], 'r') as f:
+with open(input_filepath, 'r') as f:
     def split_line(line: str) -> list[str]:
         sections = map(lambda s: s.strip(), line.split('|'))
         valid_sections = filter(lambda s: len(s) > 0, sections)
         return list(valid_sections)
     header_string = f.readline().strip()
     lines = list(map(split_line, f.readlines()))
-    widths = list(map(lambda s: len(s) - 2, filter(lambda s: len(s) > 0, header_string.split('|'))))
-    l = split_line(header_string)
-    labels = list(zip(l, widths))
+    labels = split_line(header_string)
 
-print(f'$display("{header_string}")')
-print()
+def strings(labels: list[str]) -> tuple[str, str]:
+    fmt_string = '|'
+    for _ in labels:
+        fmt_string += f'%b|'
+    label_string = ', '.join(str(l) for l in labels)
+    return (fmt_string, label_string)
+
+timeless = lambda l: list(filter(lambda s: s != 'time', l))
+outless = lambda l: list(filter(lambda s: s != 'out', l))
+
+print(f'module {input_filename_module}_test;')
+print(f'  reg {', '.join(str(l) for l in timeless(outless(labels)))};')
+print(f'  wire out;\n')
+print(f'  student_{input_filename_module} dut ({', '.join(f'.{l}({l})' for l in timeless(labels))});\n')
+
+print('  initial begin')
+print(f'    $display("{header_string.replace(' ', '')}");\n')
+
 for (test, line) in enumerate(lines):
-    for (i, (label, _)) in filter(lambda t: t[1] != 'out' and t[1] != 'time', enumerate(labels)):
+    for (i, label) in filter(lambda t: t[1] != 'out' and t[1] != 'time', enumerate(labels)):
         if len(line[i]) > 1:
-            print(f'{label} = \'b{line[i]};')
+            print(f'    {label} = \'b{line[i]};')
         else:
-            print(f'{label} = {line[i]};')
+            print(f'    {label} = {line[i]};')
 
-    def strings(labels: list[tuple[str, int]]) -> tuple[str, str]:
-        fmt_string = '|'
-        for (_, w) in labels:
-            fmt_string += f' {'%d':<{w+1}} |'
-        label_string = ", ".join(str(l) for (l, _) in labels)
-        return (fmt_string, label_string)
-
-    if labels[0][0] == 'time':
-        fmt_string, label_string = strings(list(filter(lambda s: s[0] != 'time', labels)))
+    if labels[0] == 'time':
+        fmt_string, label_string = strings(timeless(labels))
         if match('\\d+\\+', line[0]):
             time = int(line[0].removesuffix('+'))
             t_str = str(time) + '+'
-            print(f'#{time * 2 + 1} $display("| {t_str:<4} {fmt_string}", {label_string})')
+            print(f'    #{time * 2 + 1} $display("|{t_str:<4}{fmt_string}", {label_string})')
         else:
             time = int(line[0])
-            print(f'#{time * 2} $display("| {time:<4} {fmt_string}", {label_string})')
+            print(f'    #{time * 2} $display("|{time:<4}{fmt_string}", {label_string})')
     else:
         fmt_string, label_string = strings(labels)
-        print(f'#{test} $display("{fmt_string}", {label_string})')
+        print(f'    #{test + 1} $display("{fmt_string}", {label_string});')
     print()
+
+print('  $finish;')
+print('  end')
+print('endmodule')
