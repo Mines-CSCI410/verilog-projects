@@ -80,6 +80,7 @@ def read_cmp_file(filepath: str):
     return labels, lines, header_string
 
 indent_level = 0
+res = ''
 def indent(l = 2):
     global indent_level
     indent_level += l
@@ -89,16 +90,18 @@ def unindent(l = 2):
 def indented(s: str) -> str:
     return ' ' * indent_level + s
 def print_indented(s: str):
-    print(indented(s))
+    global res
+    res += indented(s) + '\n'
 
 input_filepath = argv[1]
 input_filename_module = path.basename(input_filepath).removesuffix('.cmp')
+output_filepath = argv[2]
 
 labels, lines, header_string = read_cmp_file(input_filepath)
 
 print_indented(f'module {input_filename_module}_test;')
 indent()
-print(Label.defs(labels))
+res += Label.defs(labels) + '\n'
 print_indented(f'student_{input_filename_module} dut ({', '.join(f'.{l.name}({l.name})' for l in labels)});\n')
 
 print_indented('initial begin')
@@ -118,10 +121,15 @@ for line in lines:
             display(labels, int(line[0]), line[0])
     else:
         display(labels)
-    print()
+    res += '\n'
 
 print_indented('$finish;')
 unindent()
 print_indented('end')
 unindent()
 print_indented('endmodule')
+
+if path.isdir(output_filepath):
+    output_filepath = path.join(output_filepath, f'{input_filename_module}_test.v')
+with open(output_filepath, 'w') as f:
+    f.write(res)
