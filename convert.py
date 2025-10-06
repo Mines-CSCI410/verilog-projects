@@ -29,6 +29,9 @@ class Label:
             res += indented(f'{k} {names};\n')
         return res
     
+    def assign(self, value):
+        return f'{self.name} = {self.width}\'{self.format}{value};'
+    
     def typ(self):
         io = 'reg' if self.input else 'wire'
         return io + f' [{self.width - 1}:0]' if self.width != 1 else io
@@ -45,16 +48,14 @@ class Label:
     def is_output(self):
         return not self.input
 
-global_time = 1
 default_time = object()
 def display(labels, time = default_time, t_str = ''):
     global global_time
     if time is default_time:
         time = global_time
-    print_indented(f'#{time} $display("{t_str}{Label.format_string(labels)}", {Label.parameters(labels)});')
+    write_indented(f'#{time} $display("{t_str}{Label.format_string(labels)}", {Label.parameters(labels)});')
     global_time += 1
 
-time_field = False
 def read_cmp_file(filepath: str):
     labels: list[Label] = []
     lines: list[list[str]] = []
@@ -71,16 +72,19 @@ def read_cmp_file(filepath: str):
                 global time_field
                 time_field = True
                 continue
-            print(f'---- {name} ----')
-            is_in = (input('in/out [in]: ').strip() or 'in') == 'in'
+            print('----', name, '----')
+            is_in = (input('in/out [in]: ').strip() or 'in') == 'in' if name != 'out' else False
+
             label_fmt = input('d/b/h [b]: ').strip() or 'b'
-            label_bits = 32 if label_fmt == 'd' else int(input('bits [1]: ') or 1)
+            if label_fmt == 'd':
+                label_fmt = 'sd'
+
+            label_bits = 32 if label_fmt == 'sd' else int(input('bits [1]: ') or 1)
             labels.append(Label(name, is_in, label_bits, label_fmt))
+
         lines = list(map(split_line, file.readlines()))
     return labels, lines, header_string
 
-indent_level = 0
-res = ''
 def indent(l = 2):
     global indent_level
     indent_level += l
@@ -89,47 +93,64 @@ def unindent(l = 2):
     indent_level -= l
 def indented(s: str) -> str:
     return ' ' * indent_level + s
-def print_indented(s: str):
+def write(s: str = ''):
     global res
-    res += indented(s) + '\n'
+    res += s + '\n'
+def write_indented(s: str = ''):
+    write(indented(s))
 
-input_filepath = argv[1]
-input_filename_module = path.basename(input_filepath).removesuffix('.cmp')
-output_filepath = argv[2]
+def handle_file(filename: str, output_filepath: str):
+    global indent_level
+    global res
+    global global_time
+    global time_field
+    indent_level = 0
+    res = ''
+    global_time = 1
+    time_field = False
 
-labels, lines, header_string = read_cmp_file(input_filepath)
+    module_name = path.basename(filename).removesuffix('.cmp')
 
-print_indented(f'module {input_filename_module}_test;')
-indent()
-res += Label.defs(labels) + '\n'
-print_indented(f'student_{input_filename_module} dut ({', '.join(f'.{l.name}({l.name})' for l in labels)});\n')
+    labels, lines, header_string = read_cmp_file(filename)
+    write_indented(f'module {module_name}_test;')
+    indent()
+    write(Label.defs(labels))
+    write_indented(f'student_{module_name} dut ({', '.join(f'.{l.name}({l.name})' for l in labels)});\n')
 
-print_indented('initial begin')
-indent()
-print_indented(f'$display("{header_string}");\n')
+    write_indented('initial begin')
+    indent()
+    write_indented(f'$display("{header_string}");\n')
 
-for line in lines:
-    for (i, l) in filter(lambda t: t[1].is_input(), enumerate(labels)):
-        print_indented(f'{l.name} = \'{l.format}{line[i + time_field]};')
+    for line in lines:
+        for (i, l) in filter(lambda t: t[1].is_input(), enumerate(labels)):
+            write_indented(l.assign(line[i + time_field]))
 
-    if time_field:
-        if match('\\d+\\+', line[0]):
-            time = int(line[0].removesuffix('+'))
-            t_str = '|' + str(time) + '+'
-            display(labels, time, t_str)
+        if time_field:
+            if match('\\d+\\+', line[0]):
+                time = int(line[0].removesuffix('+'))
+                t_str = '|' + str(time) + '+'
+                display(labels, time, t_str)
+            else:
+                display(labels, int(line[0]), line[0])
         else:
-            display(labels, int(line[0]), line[0])
-    else:
-        display(labels)
-    res += '\n'
+            display(labels)
+        write()
 
-print_indented('$finish;')
-unindent()
-print_indented('end')
-unindent()
-print_indented('endmodule')
+    write_indented('$finish;')
+    unindent()
+    write_indented('end')
+    unindent()
+    write_indented('endmodule')
 
-if path.isdir(output_filepath):
-    output_filepath = path.join(output_filepath, f'{input_filename_module}_test.v')
-with open(output_filepath, 'w') as f:
-    f.write(res)
+    if path.isdir(output_filepath):
+        output_filepath = path.join(output_filepath, f'{module_name}_test.v')
+    with open(output_filepath, 'w') as f:
+        f.write(res)
+
+if __name__ == '__main__':
+    if len(argv[1:]) == 1:
+        handle_file(argv[1], '/dev/stdout')
+    for filepath in argv[1:-1]:
+        filename = path.basename(filepath)
+        print('=======', filename, '=======')
+        handle_file(filepath, argv[-1])
