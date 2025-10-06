@@ -71,8 +71,11 @@ def read_cmp_file(filepath: str):
                 global time_field
                 time_field = True
                 continue
-            [label_type, label_width, label_basefmt] = input(f'{name} (in/out bits basefmt): ').split(' ')
-            labels.append(Label(name, label_type == 'in', int(label_width) if label_basefmt != 'd' else 32, label_basefmt))
+            print(f'---- {name} ----')
+            is_in = (input('in/out [in]: ').strip() or 'in') == 'in'
+            label_fmt = input('d/b/h [b]: ').strip() or 'b'
+            label_bits = 32 if label_fmt == 'd' else int(input('bits [1]: ') or 1)
+            labels.append(Label(name, is_in, label_bits, label_fmt))
         lines = list(map(split_line, file.readlines()))
     return labels, lines, header_string
 
