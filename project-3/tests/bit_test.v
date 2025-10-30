@@ -862,7 +862,5 @@ module bit_test;
     in = 1;
     load = 0;
     #214 $display("|107|%b|%b|%b|", in, load, out)
-
-    $finish;
   end
 endmodule

@@ -136,7 +136,6 @@ def handle_file(filename: str, output_filepath: str):
             display(labels)
         write()
 
-    write_indented('$finish;')
     unindent()
     write_indented('end')
     unindent()

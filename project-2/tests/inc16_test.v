@@ -18,7 +18,5 @@ module inc16_test;
 
     in = 'b1111111111111011;
     #4 $display("|%b|%b|", in, out);
-
-    $finish;
   end
 endmodule

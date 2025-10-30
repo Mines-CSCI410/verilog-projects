@@ -46,7 +46,5 @@ module full_adder_test;
     b = 1;
     c = 1;
     #8 $display("|%b|%b|%b|%b|%b|", a, b, c, sum, carry);
-
-    $finish;
   end
 endmodule

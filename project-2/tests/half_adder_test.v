@@ -22,7 +22,5 @@ module half_adder_test;
     a = 1;
     b = 1;
     #4 $display("|%b|%b|%b|%b|", a, b, sum, car);
-
-    $finish;
   end
 endmodule

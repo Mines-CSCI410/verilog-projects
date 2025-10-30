@@ -368,7 +368,5 @@ module alu_test;
     f = 0;
     no = 1;
     #36 $display("|%b|%b|%b|%b|%b|%b|%b|%b|%b|%b|%b|", x, y, zx, nx, zy, ny, f, no, out, zr, ng);
-
-    $finish;
   end
 endmodule
