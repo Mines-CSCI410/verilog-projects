@@ -30,11 +30,13 @@ class Label:
         return res
     
     def assign(self, value):
+        if self.format == 'd':
+            return f'{self.name} = {value};'
         return f'{self.name} = {self.width}\'{self.format}{value};'
     
     def typ(self):
         io = 'reg' if self.input else 'wire'
-        return io + f' [{self.width - 1}:0]' if self.width != 1 else io
+        return io + (' signed' if self.format == 'd' else '' ) + f' [{self.width - 1}:0]' if self.width != 1 else io
     
     def is_time(self):
         return self.name == 'time'
@@ -53,7 +55,7 @@ def display(labels, time = default_time, t_str = ''):
     global global_time
     if time is default_time:
         time = global_time
-    write_indented(f'#{time} $display("{t_str}{Label.format_string(labels)}", {Label.parameters(labels)});')
+    write_indented(f'#1 $display("{t_str}{Label.format_string(labels)}", {Label.parameters(labels)});')
     global_time += 1
 
 def read_cmp_file(filepath: str):
@@ -76,10 +78,8 @@ def read_cmp_file(filepath: str):
             is_in = (input('in/out [in]: ').strip() or 'in') == 'in' if name != 'out' else False
 
             label_fmt = input('d/b/h [b]: ').strip() or 'b'
-            if label_fmt == 'd':
-                label_fmt = 'sd'
 
-            label_bits = 32 if label_fmt == 'sd' else int(input('bits [1]: ') or 1)
+            label_bits = 16 if label_fmt == 'd' else int(input('bits [1]: ') or 1)
             labels.append(Label(name, is_in, label_bits, label_fmt))
 
         lines = list(map(split_line, file.readlines()))
@@ -131,11 +131,12 @@ def handle_file(filename: str, output_filepath: str):
                 t_str = '|' + str(time) + '+'
                 display(labels, time, t_str)
             else:
-                display(labels, int(line[0]), line[0])
+                display(labels, int(line[0]), '|' + line[0])
         else:
             display(labels)
         write()
 
+    write_indented('$finish;')
     unindent()
     write_indented('end')
     unindent()
