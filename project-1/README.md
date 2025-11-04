@@ -38,7 +38,10 @@ If you have any issues with running the tests or the autograder, check Ed discus
 and then send me an email at [grant_lemons_sw@mines.edu](mailto:grant_lemons_sw@mines.edu)
 if there's nothing about said issue there. I'd rather not get flooded with emails haha.
 
-## Using Modules
+## Verilog
+Read the FPGA and Verilog Primer through the section on Loops.
+
+### Using Modules
 To use a module, instantiate one as follows:
 ```
 <module_name> <instance_name> (<parameters>);
