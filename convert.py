@@ -9,6 +9,7 @@ class Label:
     input: bool
     width: int
     format: str
+    signed: bool
     
     @staticmethod
     def format_string(labels) -> str:
@@ -36,7 +37,7 @@ class Label:
     
     def typ(self):
         io = 'reg' if self.input else 'wire'
-        return io + (' signed' if self.format == 'd' else '' ) + f' [{self.width - 1}:0]' if self.width != 1 else io
+        return io + (' signed' if self.signed else '' ) + f' [{self.width - 1}:0]' if self.width != 1 else io
     
     def is_time(self):
         return self.name == 'time'
@@ -51,12 +52,15 @@ class Label:
         return not self.input
 
 default_time = object()
+last_t_str = ''
 def display(labels, time = default_time, t_str = ''):
-    global global_time
+    global global_time, last_t_str
     if time is default_time:
         time = global_time
-    write_indented(f'#1 $display("{t_str}{Label.format_string(labels)}", {Label.parameters(labels)});')
+    delay = 0 if t_str == last_t_str and t_str != '' else 1
+    write_indented(f'#{delay} $display("{t_str}{Label.format_string(labels)}", {Label.parameters(labels)});')
     global_time += 1
+    last_t_str = t_str
 
 def read_cmp_file(filepath: str):
     labels: list[Label] = []
@@ -75,12 +79,16 @@ def read_cmp_file(filepath: str):
                 time_field = True
                 continue
             print('----', name, '----')
-            is_in = (input('in/out [in]: ').strip() or 'in') == 'in' if name != 'out' else False
+            is_in = name == 'in' or (input('in/out [in]: ').strip() or 'in') == 'in' if name != 'out' else False
 
-            label_fmt = input('d/b/h [b]: ').strip() or 'b'
+            label_fmt = input('d/sd/b/h [b]: ').strip() or 'b'
+            signed = label_fmt == 'sd'
+            if signed:
+                label_fmt = 'd'
 
-            label_bits = 16 if label_fmt == 'd' else int(input('bits [1]: ') or 1)
-            labels.append(Label(name, is_in, label_bits, label_fmt))
+            default_bits = 16 if label_fmt == 'd' else 1
+            label_bits = int(input(f'bits [{default_bits}]: ') or default_bits)
+            labels.append(Label(name, is_in, label_bits, label_fmt, signed))
 
         lines = list(map(split_line, file.readlines()))
     return labels, lines, header_string
