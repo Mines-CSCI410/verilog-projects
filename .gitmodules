@@ -7,3 +7,6 @@
 [submodule "project-3/autograder"]
 	path = project-3/autograder
 	url = https://github.com/Mines-CSCI410/project-3-autograder.git
+[submodule "project-5/autograder"]
+	path = project-5/autograder
+	url = https://github.com/Mines-CSCI410/project-5-autograder.git
