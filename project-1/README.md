@@ -2,6 +2,8 @@
 
 Develop your solution for each gate.
 You can use NAND (`nand_gate`) or any gate you've already created (`student_<xyz>`).
+Please don't use the verilog `assign` syntax, as the goal with this project is
+to understand how to model each gate out of others.
 
 Please don't use built-in versions of the gate you are modeling, the point of
 the exercise is to get you thinking about how to model each gate out of others.
@@ -13,7 +15,9 @@ You can complete the gates in any order you like, but I recommend the following:
 2. AND
 3. OR
 4. XOR
-5. I haven't finished the list yet
+5. 16-bit versions
+6. MUX & DMUX
+7. Multi-way MUX & DMUX
 
 ## Testing
 There is a test script provided `./tests/test_script.sh`.
