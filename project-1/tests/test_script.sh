@@ -4,7 +4,7 @@
 SCRIPT_DIR=$( dirname -- "${BASH_SOURCE[0]}" )
 pushd ${SCRIPT_DIR} &> /dev/null
 
-TESTS=("and" "and16" "dmux" "dmux4way" "dmux8way" "mux" "mux4way16" "mux8way16" "mux16" "not" "not16" "or" "or8way" "or16" "xor")
+TESTS=("and" "and16" "dmux" "dmux4way" "dmux8way" "mux" "mux4way16" "mux8way16" "mux16" "not" "not16" "or" "or8way" "or16" "xor" "xor16")
 PASSED=()
 FAILED=()
 
