@@ -22,7 +22,7 @@ endmodule
 /*
  * Using your 16-bit solution above, create a version that accepts four inputs.
  */
-module student_4way16 (input [15:0] a, b, c, d, input [1:0] sel, output [15:0] out);
+module student_mux4way16 (input [15:0] a, b, c, d, input [1:0] sel, output [15:0] out);
     // Your solution here
 endmodule
 
