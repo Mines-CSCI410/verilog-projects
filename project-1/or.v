@@ -30,8 +30,9 @@ endmodule
 module student_or8way (input [7:0] in, output out);
     genvar i;
     generate
-        for (i=start_index; i<end_index; i=i+1) begin
-            // Use your student_or gate here for each bit in the input vector
+        for (i=0; i<7; i=i+1) begin
+            // Use your student_or gate here
+            // This isn't the same as our 16-bit versions, this is 8-WAY.
         end
     endgenerate
 endmodule
