@@ -1,6 +1,9 @@
 // Read the section of the Verilog Primer (linked to on the Canvas page) about
 // Muxlib. It will be helpful.
 
+// As you implement more of these (especially ram16k) running the tests will
+// be pretty slow. That is expected.
+
 module student_ram8 (input [15:0] in, input load, input [2:0] address, output [15:0] out);
 endmodule
 
