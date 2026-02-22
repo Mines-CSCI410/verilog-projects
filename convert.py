@@ -12,8 +12,8 @@ class Label:
     signed: bool
     
     @staticmethod
-    def format_string(labels) -> str:
-        return '|' + '|'.join(f'%{l.format}' for l in labels) + '|'
+    def format_string(labels, wildcard_fields=[]) -> str:
+        return '|' + '|'.join(f'%{l.format}' if i not in wildcard_fields else '*******' for i, l in enumerate(labels)) + '|'
 
     @staticmethod
     def parameters(labels) -> str:
@@ -53,12 +53,13 @@ class Label:
 
 default_time = object()
 last_t_str = ''
-def display(labels, time = default_time, t_str = ''):
+def display(labels, time = default_time, t_str = '', wildcard_fields=[]):
     global global_time, last_t_str
     if time is default_time:
         time = global_time
     delay = 0 if t_str == last_t_str and t_str != '' else 1
-    write_indented(f'#{delay} $display("{t_str}{Label.format_string(labels)}", {Label.parameters(labels)});')
+    wildcard_fields = [i if t_str == '' else i-1 for i in wildcard_fields]
+    write_indented(f'#{delay} $display("{t_str}{Label.format_string(labels, wildcard_fields)}", {Label.parameters([l for i, l in enumerate(labels) if i not in wildcard_fields])});')
     global_time += 1
     last_t_str = t_str
 
@@ -133,15 +134,16 @@ def handle_file(filename: str, output_filepath: str):
         for (i, l) in filter(lambda t: t[1].is_input(), enumerate(labels)):
             write_indented(l.assign(line[i + time_field]))
 
+        wildcard_fields = [i for i, v in enumerate(line) if v == '*******']
         if time_field:
             if match('\\d+\\+', line[0]):
                 time = int(line[0].removesuffix('+'))
                 t_str = '|' + str(time) + '+'
-                display(labels, time, t_str)
+                display(labels, time, t_str, wildcard_fields)
             else:
-                display(labels, int(line[0]), '|' + line[0])
+                display(labels, int(line[0]), '|' + line[0], wildcard_fields)
         else:
-            display(labels)
+            display(labels, wildcard_fields)
         write()
 
     write_indented('$finish;')
