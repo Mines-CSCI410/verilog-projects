@@ -6,7 +6,6 @@
 module fast_ram #(parameter N = 8) (input [15:0] in, input load, input [$clog2(N)-1:0] address, output [15:0] out);
     reg [(N*16)-1:0] mem_contents;
     reg clock;
-    clock c (clk);
 
     initial begin
         clock = 0;
