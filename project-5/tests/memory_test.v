@@ -6,7 +6,7 @@ module memory_test;
   wire [(16*(2**15))-1:0] mem_contents;
 
   reg [(16*(2**15))-1:0] memory = 524288'b0;
-  student_memory #(15) dut (.data(memory), .reload(1'b0), .in(in), .load(load), .address(address), .out(out), .mem_contents(mem_contents));
+  computer_memory #(15) dut (.data(memory), .reload(1'b0), .in(in), .load(load), .address(address), .out(out), .mem_contents(mem_contents));
 
   initial begin
     $display("|in|load|address|out|");

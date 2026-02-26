@@ -21,7 +21,7 @@ module computer_max_test;
   reg [(16*32768)-1:0] data;
   reg reload;
   reg [((2**15)*16)-1:0] memory = 524288'b0;
-  student_computer dut (.program(data), .memory(memory), .reload(reload), .reset(reset), .ARegister(ARegister), .DRegister(DRegister), .pc(pc), .mem_contents(mem_contents));
+  computer dut (.program(data), .memory(memory), .reload(reload), .reset(reset), .ARegister(ARegister), .DRegister(DRegister), .pc(pc), .mem_contents(mem_contents));
 
   initial begin
     $display("|time|reset|ARegister|DRegister|PC[]|RAM16K[0]|RAM16K[1]|RAM16K[2]|");
