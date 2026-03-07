@@ -4,6 +4,7 @@ module computer_rect_test;
   wire [((2**15)*16)-1:0] mem_contents;
 
   reg [16-1:0] filedata [32768-1:0];
+  reg [(16*32768)-1:0] data;
 
   integer i;
   initial begin
@@ -15,7 +16,6 @@ module computer_rect_test;
     for (i = 0; i < 32768; i+=1) data[16*i +: 16] = filedata[i];
   end
 
-  reg [(16*32768)-1:0] data;
   reg [((2**15)*16)-1:0] memory = 524288'b0;
   computer dut (.program(data), .memory(memory), .reset(1'b0), .ARegister(ARegister), .DRegister(DRegister), .pc(pc), .mem_contents(mem_contents));
 
